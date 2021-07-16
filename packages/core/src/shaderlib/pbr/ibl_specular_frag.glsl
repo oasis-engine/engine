@@ -1,20 +1,3 @@
-#if defined( RE_IndirectSpecular )
+vec3 radiance = getIndirectRadiance( geometry, material.specularRoughness, int(u_envMapLight.maxMipMapLevel) );
 
-    vec3 radiance = vec3( 0.0 );
-
-#endif
-
-
-
-#if defined( RE_IndirectSpecular )
-
-    radiance += getLightProbeIndirectRadiance( geometry, Material_BlinnShininessExponent( material ), int(u_envMapLight.mipMapLevel) );
-
-#endif
-
-
-#if defined( RE_IndirectSpecular )
-
-    RE_IndirectSpecular( radiance, geometry, material, reflectedLight );
-
-#endif
+RE_IndirectSpecular_Physical( radiance, irradiance * u_envMapLight.specularIntensity * RECIPROCAL_PI, geometry, material, reflectedLight );

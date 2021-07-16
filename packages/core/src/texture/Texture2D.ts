@@ -42,7 +42,7 @@ export class Texture2D extends Texture {
 
     this._platformTexture = engine._hardwareRenderer.createPlatformTexture2D(this);
 
-    this.filterMode = TextureFilterMode.Bilinear;
+    this.filterMode = TextureFilterMode.Trilinear;
     this.wrapModeU = this.wrapModeV = TextureWrapMode.Repeat;
   }
 
@@ -94,8 +94,16 @@ export class Texture2D extends Texture {
    * @param width - Area width
    * @param height - Area height
    * @param out - Color buffer
+   * @param mipLevel - Set mip level the data want to get from
    */
-  getPixelBuffer(x: number, y: number, width: number, height: number, out: ArrayBufferView): void {
-    (this._platformTexture as IPlatformTexture2D).getPixelBuffer(x, y, width, height, out);
+  getPixelBuffer(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    out: ArrayBufferView,
+    mipLevel: number = 0
+  ): void {
+    (this._platformTexture as IPlatformTexture2D).getPixelBuffer(x, y, width, height, out, mipLevel);
   }
 }

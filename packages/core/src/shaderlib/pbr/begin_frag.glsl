@@ -14,7 +14,7 @@
     #ifdef HAS_BASECOLORMAP
 
         vec4 baseMapColor = texture2D( u_baseColorSampler, v_uv );
-        baseMapColor = SRGBtoLINEAR( baseMapColor );
+        baseMapColor = SRGBtoLinear( baseMapColor );
         diffuseColor *= baseMapColor;
 
     #endif
@@ -83,15 +83,17 @@
 
         #ifdef IS_METALLIC_WORKFLOW
             material.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );
-            material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );
-//          material.specularColor = mix( vec3( DEFAULT_SPECULAR_COEFFICIENT ), diffuseColor.rgb, metalnessFactor );
-            material.specularColor = mix( vec3( MAXIMUM_SPECULAR_COEFFICIENT /* pow2( reflectivity )*/ ), diffuseColor.rgb, metalnessFactor );
+            material.specularColor = mix( vec3( DEFAULT_SPECULAR_COEFFICIENT ), diffuseColor.rgb, metalnessFactor );
+            material.specularRoughness = clamp( roughnessFactor, 0.005, 1.0 );
         #else
             float specularStrength = max( max( specularFactor.r, specularFactor.g ), specularFactor.b );
             material.diffuseColor = diffuseColor.rgb * ( 1.0 - specularStrength );
-            material.specularRoughness = clamp( 1.0 - glossinessFactor, 0.04, 1.0 );
             material.specularColor = specularFactor;
+            material.specularRoughness = clamp( 1.0 - glossinessFactor, 0.005, 1.0 );
         #endif
+        
+        material.specularRoughness += getAARoughnessFactor(normal);
+        material.specularRoughness = min( material.specularRoughness, 1.0 );
 
         geometry.position = v_pos;
         geometry.normal = normal;

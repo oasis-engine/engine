@@ -1,24 +1,17 @@
-vec4 SRGBtoLINEAR(vec4 srgbIn)
+vec4 SRGBtoLinear(vec4 srgbIn)
 {
-    #ifdef MANUAL_SRGB
-
-        #ifdef SRGB_FAST_APPROXIMATION
-
-            vec3 linOut = pow(srgbIn.xyz, vec3(2.2));
-        #else
-
-         vec3 bLess = step(vec3(0.04045), srgbIn.xyz);
-         vec3 linOut = mix(srgbIn.xyz/vec3(12.92), pow((srgbIn.xyz+vec3(0.055))/vec3(1.055), vec3(2.4)), bLess);
-
-        #endif
-
-    return vec4(linOut, srgbIn.w);;
-
+    #ifdef SRGB_FAST_APPROXIMATION
+        vec3 linOut = pow(srgbIn.xyz, vec3(2.2));
     #else
-
-    return srgbIn;
-
+        vec3 bLess = step(vec3(0.04045), srgbIn.xyz);
+        vec3 linOut = mix(srgbIn.xyz/vec3(12.92), pow((srgbIn.xyz+vec3(0.055))/vec3(1.055), vec3(2.4)), bLess);
     #endif
+
+    return vec4(linOut, srgbIn.a);
+}
+
+vec4 RGBEToLinear(vec4 value) {
+    return vec4( step(0.0, value.a) * value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );
 }
 
 float pow2( const in float x ) {
@@ -35,11 +28,6 @@ vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
 }
 
-// source: http://simonstechblog.blogspot.ca/2011/12/microfacet-brdf.html
-float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {
-    return ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );
-}
-
 
 float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {
 
@@ -51,4 +39,18 @@ float computeSpecularOcclusion( const in float dotNV, const in float ambientOccl
 float getLuminance(vec3 color)
 {
     return dot(color, vec3(0.2126, 0.7152, 0.0722));
+}
+
+// roughness anti-alias
+float getAARoughnessFactor(vec3 normalVector) {
+    #ifdef HAS_DERIVATIVES
+        vec3 nDfdx = dFdx(normalVector);
+        vec3 nDfdy = dFdy(normalVector);
+        float slopeSquare = max(dot(nDfdx, nDfdx), dot(nDfdy, nDfdy));
+        float geometricAlphaGFactor = sqrt(slopeSquare);
+        geometricAlphaGFactor *= 0.75;
+        return geometricAlphaGFactor;
+    #endif
+
+    return 0.0;
 }

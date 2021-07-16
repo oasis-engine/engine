@@ -13,6 +13,7 @@ export class RenderColorTexture extends Texture {
   private _autoMipmap: boolean = false;
   private _format: RenderBufferColorFormat;
   private _isCube: boolean = false;
+  _isHDR: boolean = false;
 
   /**
    * Texture format.
@@ -79,6 +80,7 @@ export class RenderColorTexture extends Texture {
    * @param width - Area width
    * @param height - Area height
    * @param out - Color buffer
+   * @param mipLevel - Set mip level the data want to get from
    */
   public getPixelBuffer(
     face: TextureCubeFace | null,
@@ -86,8 +88,9 @@ export class RenderColorTexture extends Texture {
     y: number,
     width: number,
     height: number,
-    out: ArrayBufferView
+    out: ArrayBufferView,
+    mipLevel: number = 0
   ): void {
-    (this._platformTexture as IPlatformRenderColorTexture).getPixelBuffer(face, x, y, width, height, out);
+    (this._platformTexture as IPlatformRenderColorTexture).getPixelBuffer(face, x, y, width, height, out, mipLevel);
   }
 }

@@ -35,8 +35,8 @@ import { LightFeature, hasLight } from "./lighting/LightFeature";
 import { Scene } from "./Scene";
 Scene.registerFeature(LightFeature);
 (Scene.prototype as any).hasLight = hasLight;
-// Quote raycast
-import "./raycast";
+
+export { PhysicsManager, HitResult } from "./PhysicsManager";
 
 export { Background } from "./Background";
 export { BackgroundMode } from "./enums/BackgroundMode";
